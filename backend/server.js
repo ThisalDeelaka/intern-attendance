@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const cors = require("cors"); 
 const internRoutes = require('./routes/internRoutes');
 const path = require('path');
 
@@ -9,7 +10,7 @@ dotenv.config();
 
 // Initialize app
 const app = express();
-
+app.use(cors());
 // Middleware
 app.use(express.json());
 
