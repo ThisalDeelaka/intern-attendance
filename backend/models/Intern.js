@@ -10,7 +10,7 @@ const internSchema = new mongoose.Schema({
   traineeId: { type: String, required: true, unique: true },
   traineeName: { type: String, required: true },
   team: { type: String, required: true },
-  attendance: [attendanceSchema],  // Array of attendance records
+  attendance: [attendanceSchema],  
 });
 
 module.exports = mongoose.model('Intern', internSchema);

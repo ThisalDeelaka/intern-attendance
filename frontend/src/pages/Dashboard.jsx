@@ -27,7 +27,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
       <div className="flex-1 bg-white">
         <Navbar />
@@ -42,16 +42,16 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Interns Section */}
-          <div className="bg-white shadow-lg rounded-xl p-8 mt-10">
+          <div className="bg-white shadow-xl rounded-2xl p-8 mt-10">
             <h3 className="text-2xl font-semibold text-gray-800 mb-6">Recent Interns</h3>
-            <ul className="space-y-4">
+            <ul className="space-y-6">
               {recentInterns.map((intern) => (
                 <li key={intern.traineeId} className="flex items-center space-x-4 border-b pb-4">
                   <div className="flex-1">
                     <p className="text-lg font-medium text-gray-800">{intern.traineeName}</p>
                     <p className="text-sm text-gray-600">{intern.group} - {intern.team}</p>
                   </div>
-                  <Link to={`/intern/${intern.traineeId}`} className="text-blue-600 hover:text-blue-800">View Details</Link>
+                  <Link to={`/intern/${intern.traineeId}`} className="text-blue-600 hover:text-blue-800 font-semibold">View Details</Link>
                 </li>
               ))}
             </ul>

@@ -5,10 +5,10 @@ const Intern = require("../models/Intern"); // Import Intern model
 
 const router = express.Router();
 
-// ✅ CSV Upload Route
+//CSV Upload Route
 router.post("/upload", upload.single("file"), uploadCSV);
 
-// ✅ Fetch All Interns Route
+// Fetch All Interns Route
 router.get("/", async (req, res) => {
   try {
     const interns = await Intern.find();
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ Mark Attendance Route (NEW)
+// Mark Attendance Route (NEW)
 router.post("/mark-attendance/:id", async (req, res) => {
   try {
     const { status } = req.body; // "Present" or "Absent"

@@ -1,81 +1,62 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { HiOutlineUserGroup, HiOutlineDocumentText, HiOutlineClipboardList, HiOutlineCalendar, HiOutlineBell, HiOutlineViewGrid } from "react-icons/hi";
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom'; // For navigation
+import { HomeIcon, UserGroupIcon, UploadIcon, CogIcon, SupportIcon } from '@heroicons/react/outline'; // Tailwind icons
+import logo from '../assets/slt logo.jpg'; // Import the logo from the assets folder
 
 const Sidebar = () => {
+  const [isInternMenuOpen, setIsInternMenuOpen] = useState(false);
+  const location = useLocation(); // Get current route using useLocation hook
+
+  // Function to apply green highlight for active links and change text color to black
+  const isActive = (path) => location.pathname === path ? 'bg-[#4FB846] text-black' : 'text-gray-400';
+
   return (
-    <div className="w-64 h-screen bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 border-r shadow-lg p-6 flex flex-col sticky top-0 z-10">
-      {/* Branding */}
-      <div className="text-3xl font-bold text-blue-600 mb-8">
-        SLTMobitel
+    <div className="w-64 bg-[#0D103A] text-white h-screen flex flex-col sticky top-0"> {/* Sticky Sidebar */}
+      {/* Sidebar Header */}
+      <div className="flex items-center justify-center p-4 bg-[#0D103A] text-2xl font-bold">
+        <img src={logo} alt="SLT Logo" className="h-40 w-40 object-contain" /> {/* Adjusted logo size */}
       </div>
 
-      {/* Navigation Sections */}
-      <div className="flex-1 space-y-8">
+      {/* Sidebar Links */}
+      <div className="flex flex-col space-y-4 p-4">
+        {/* Dashboard Link */}
+        <Link to="/" className={`flex items-center space-x-2 p-2 rounded-md hover:bg-[#4FB846] ${isActive('/')} pb-1`}>
+          <HomeIcon className="h-6 w-6" />
+          <span>Dashboard</span>
+        </Link>
+
+        {/* Intern Management Section */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-600 uppercase mb-4 tracking-wider">Realtime</h2>
-          <ul className="space-y-4">
-            <li>
-              <Link to="/" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineViewGrid className="mr-3" /> Overview
+          <button 
+            onClick={() => setIsInternMenuOpen(!isInternMenuOpen)} 
+            className={`flex items-center space-x-2 p-2 rounded-md hover:bg-[#4FB846] ${isActive('/interns')} pb-1`}
+          >
+            <UserGroupIcon className="h-6 w-6" />
+            <span>Intern Management</span>
+          </button>
+
+          {/* Submenu for Upload CSV */}
+          {isInternMenuOpen && (
+            <div className="ml-6 flex flex-col space-y-2">
+              <Link to="/upload" className={`flex items-center space-x-2 p-2 rounded-md hover:bg-[#4FB846] text-gray-300`}>
+                <UploadIcon className="h-5 w-5" />
+                <span>Upload CSV</span>
               </Link>
-            </li>
-            <li>
-              <Link to="/my-team" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineUserGroup className="mr-3" /> My Team
-              </Link>
-            </li>
-          </ul>
+            </div>
+          )}
         </div>
 
-        {/* Other Sections */}
-        <div>
-          <h2 className="text-sm font-semibold text-gray-600 uppercase mb-4 tracking-wider">Proof of Work</h2>
-          <ul className="space-y-4">
-            <li>
-              <Link to="/screenshots" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineClipboardList className="mr-3" /> Screenshots
-              </Link>
-            </li>
-            <li>
-              <Link to="/timelapse-videos" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineDocumentText className="mr-3" /> Timelapse Videos
-              </Link>
-            </li>
-            <li>
-              <Link to="/timesheet" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineClipboardList className="mr-3" /> Timesheet
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {/* Settings Link */}
+        <Link to="/settings" className={`flex items-center space-x-2 p-2 rounded-md hover:bg-[#4FB846] ${isActive('/settings')} pb-1`}>
+          <CogIcon className="h-6 w-6" />
+          <span>Settings</span>
+        </Link>
 
-        {/* Leave Management Section */}
-        <div>
-          <h2 className="text-sm font-semibold text-gray-600 uppercase mb-4 tracking-wider">Leave Management</h2>
-          <ul className="space-y-4">
-            <li>
-              <Link to="/apply-leave" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineCalendar className="mr-3" /> Apply Leave
-              </Link>
-            </li>
-            <li>
-              <Link to="/leave-summary" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineCalendar className="mr-3" /> Leave Summary
-              </Link>
-            </li>
-            <li>
-              <Link to="/manage-leave" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineCalendar className="mr-3" /> Manage Leave
-              </Link>
-            </li>
-            <li>
-              <Link to="/manage-holiday" className="flex items-center text-gray-600 hover:text-blue-600 py-2 px-4 rounded-lg transition-all duration-300 ease-in-out hover:bg-blue-50">
-                <HiOutlineCalendar className="mr-3" /> Manage Holiday
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {/* Help/Support Link */}
+        <Link to="/help" className={`flex items-center space-x-2 p-2 rounded-md hover:bg-[#4FB846] ${isActive('/help')} pb-1`}>
+          <SupportIcon className="h-6 w-6" />
+          <span>Help/Support</span>
+        </Link>
       </div>
     </div>
   );
