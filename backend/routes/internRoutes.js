@@ -1,14 +1,14 @@
 const express = require("express");
 const { uploadFile } = require("../controllers/internController");
 const upload = require("../middleware/uploadMiddleware");
-const Intern = require("../models/Intern"); // Import Intern model
+const Intern = require("../models/Intern"); 
 
 const router = express.Router();
 
-// XLSX Upload Route
+
 router.post("/upload", upload.single("file"), uploadFile);
 
-// Fetch All Interns Route
+
 router.get("/", async (req, res) => {
   try {
     const interns = await Intern.find();
@@ -18,24 +18,24 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Mark Attendance Route (NEW)
+
 router.post("/mark-attendance/:id", async (req, res) => {
   try {
-    const { status } = req.body; // "Present" or "Absent"
+    const { status } = req.body; 
     
-    // Find the intern by ID
+  
     const intern = await Intern.findById(req.params.id);
     if (!intern) {
       return res.status(404).json({ message: "Intern not found" });
     }
 
-    // Ensure "status" is valid
+  
     if (!["Present", "Absent"].includes(status)) {
       return res.status(400).json({ message: "Invalid attendance status" });
     }
 
     // Check if attendance for today already exists
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0]; 
     const alreadyMarked = intern.attendance.some(
       (entry) => entry.date.toISOString().split("T")[0] === today
     );

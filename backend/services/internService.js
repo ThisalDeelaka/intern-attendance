@@ -10,7 +10,7 @@ class InternService {
     return intern;
   }
 
-  // Additional business logic for Intern services can go here...
+  
 }
 
 module.exports = new InternService();

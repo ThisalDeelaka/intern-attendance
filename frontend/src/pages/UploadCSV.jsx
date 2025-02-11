@@ -1,11 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 
 const UploadCSV = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -31,9 +31,9 @@ const UploadCSV = () => {
     }
   };
 
-  // Function to handle close action and go back
+  
   const handleClose = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1); 
   };
 
   return (

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable"; // Import autoTable plugin
-import { ToastContainer, toast } from 'react-toastify'; // Import react-toastify
+import "jspdf-autotable"; 
+import { ToastContainer, toast } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
 
 const InternsPage = () => {
@@ -13,7 +13,7 @@ const InternsPage = () => {
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Items per page
+  const [itemsPerPage, setItemsPerPage] = useState(10); 
   const [file, setFile] = useState(null);
 
   // Fetch interns and attendance data
@@ -33,18 +33,18 @@ const InternsPage = () => {
     fetchInterns();
   }, []);
 
-  // Function to update attendance status with hover and animation effect
+
   const handleMarkAttendance = async (id, status) => {
     try {
       await axios.post(`http://localhost:5000/api/interns/mark-attendance/${id}`, { status });
 
-      // Update the UI immediately with a smooth animation
+      
       setInterns((prevInterns) =>
         prevInterns.map((intern) =>
           intern._id === id
             ? {
                 ...intern,
-                attendance: [{ status }], // Updating attendance status immediately
+                attendance: [{ status }], 
               }
             : intern
         )
@@ -55,27 +55,26 @@ const InternsPage = () => {
     }
   };
 
-  // Extract unique Field of Specialization for dropdown
+  
   const uniqueSpecializations = [...new Set(interns.map((i) => i.fieldOfSpecialization))];
 
-  // Get current interns based on page
+  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentInterns = interns.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Change page
+  
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Function to generate and download the PDF
+  
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    // Add company name and logo
+    
     doc.setFontSize(14);
-    doc.setTextColor(41, 128, 185); // Set a professional blue color
-    doc.text("SLTMobitel", 14, 20); // Company name
+    doc.setTextColor(41, 128, 185); 
+    doc.text("SLTMobitel", 14, 20); 
 
-    // Add current date
     const currentDate = new Date().toLocaleDateString();
     doc.setFontSize(10);
     doc.text(`Date: ${currentDate}`, 14, 30);
@@ -88,14 +87,14 @@ const InternsPage = () => {
     doc.setFontSize(10);
     doc.text(sortingInfo, 14, 40);
 
-    // Add report title
+   
     doc.setFontSize(16);
     doc.text("Intern Attendance Report", 14, 50);
 
-    // Add table headers
+   
     const headers = [["Trainee ID", "Name", "Field of Specialization", "Team", "Attendance"]];
     
-    // Prepare table data
+
     const filteredInterns = interns
       .filter(
         (intern) =>
@@ -114,22 +113,22 @@ const InternsPage = () => {
           : "Not Marked",
       ]);
 
-    // Use autoTable to create the table inside the PDF
+   
     doc.autoTable({
       head: headers,
       body: filteredInterns,
-      startY: 60, // Start below the title and info
+      startY: 60, 
       theme: "striped",
       styles: { fontSize: 10, cellPadding: 3 },
       headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: "bold" },
       bodyStyles: { fillColor: [242, 242, 242] },
     });
 
-    // Save the generated PDF
+    
     doc.save("intern-attendance-report.pdf");
   };
 
-  // File upload and handling
+ 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -148,7 +147,7 @@ const InternsPage = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success(response.data.message);
-      fetchInterns(); // Refresh intern data
+      fetchInterns(); 
     } catch (error) {
       console.error("Error uploading:", error);
       toast.error("Error uploading file.");

@@ -21,7 +21,7 @@ const Login = () => {
 
       if (response.data.success) {
         setMessage("Login successful!");
-        navigate("/dashboard"); // Redirect to dashboard after successful login
+        navigate("/dashboard"); 
       } else {
         setMessage("Invalid email or password.");
       }

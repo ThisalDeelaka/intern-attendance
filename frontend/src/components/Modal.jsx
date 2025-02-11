@@ -1,4 +1,4 @@
-// Modal.js
+
 import React from 'react';
 
 const Modal = ({ showModal, closeModal, children }) => {
