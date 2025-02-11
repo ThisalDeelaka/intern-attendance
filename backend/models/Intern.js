@@ -6,11 +6,11 @@ const attendanceSchema = new mongoose.Schema({
 });
 
 const internSchema = new mongoose.Schema({
-  group: { type: String, required: true },
-  traineeId: { type: String, required: true, unique: true },
-  traineeName: { type: String, required: true },
-  team: { type: String, required: true },
-  attendance: [attendanceSchema],  
+  traineeId: { type: String, required: true, unique: true },  // Trainee ID from XLSX
+  traineeName: { type: String, required: true },  // Trainee Name from XLSX
+  fieldOfSpecialization: { type: String, required: true },  // Field_of_Specialization from XLSX
+  team: { type: String, default: "" },  // Initially empty, will be added later
+  attendance: [attendanceSchema],  // Attendance tracking
 });
 
 module.exports = mongoose.model('Intern', internSchema);

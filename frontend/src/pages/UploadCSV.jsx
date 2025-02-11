@@ -24,14 +24,15 @@ const UploadCSV = () => {
       });
       setMessage(response.data.message);
     } catch (error) {
+      console.error("Error uploading:", error);
       setMessage("Error uploading file.");
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <h2 className="text-2xl font-semibold mb-4">Upload CSV File</h2>
-      <input type="file" accept=".csv" onChange={handleFileChange} className="mb-4" />
+      <h2 className="text-2xl font-semibold mb-4">Upload XLSX File</h2>
+      <input type="file" accept=".xlsx" onChange={handleFileChange} className="mb-4" />
       <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 rounded">
         Upload
       </button>
@@ -40,4 +41,4 @@ const UploadCSV = () => {
   );
 };
 
-export default UploadCSV;
+export default UploadCSV; 

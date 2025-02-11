@@ -1,41 +1,36 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom'; // Import useLocation hook
-import { BellIcon, UserCircleIcon } from '@heroicons/react/outline'; // Tailwind icons
+import { Link, useLocation } from 'react-router-dom';
+import { BellIcon, UserCircleIcon } from '@heroicons/react/outline';
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const location = useLocation(); // Get current route using useLocation hook
+  const location = useLocation();
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // Function to apply underline when active with custom green color
   const isActive = (path) => location.pathname === path ? 'border-b-2 border-[#4FB846]' : '';
 
   return (
     <nav className="bg-[#0D103A] text-white p-4 shadow-md">
       <div className="flex items-center">
-        {/* Removed Logo Placeholder */}
-
-        {/* Links */}
-        <div className="ml-auto flex items-center space-x-6"> {/* Align links to the right */}
-          {/* Dashboard Link */}
+        <div className="ml-auto flex items-center space-x-6">
           <Link 
             to="/" 
             className={`hover:text-[#4FB846] ${isActive('/')} pb-1`}
           >
             Dashboard
           </Link>
-          {/* Intern Page Link */}
+
           <Link 
             to="/interns" 
             className={`hover:text-[#4FB846] ${isActive('/interns')} pb-1`}
           >
             Intern Page
           </Link>
-          {/* Attendance Overview Dropdown */}
+
           <div className="relative">
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
@@ -51,16 +46,14 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Search Bar */}
           <input
             type="text"
             placeholder="Search by Name or ID"
             value={searchTerm}
             onChange={handleSearchChange}
-            className="px-3 py-2 rounded-lg bg-gray-800 text-white focus:outline-none"
+            className="px-3 py-2 rounded-lg bg-gray-800 text-white focus:outline-none md:w-64 w-48"
           />
 
-          {/* Notifications */}
           <div className="relative">
             <BellIcon className="h-6 w-6 cursor-pointer hover:text-[#4FB846]" />
             <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -68,7 +61,6 @@ const Navbar = () => {
             </span>
           </div>
 
-          {/* User Profile Dropdown */}
           <div className="relative">
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)} 

@@ -27,6 +27,12 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes
 app.use('/api/interns', internRoutes);
 
+// Test route at the root
+app.get('/', (req, res) => {
+  res.send('Server is up and running!');
+});
+
+
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

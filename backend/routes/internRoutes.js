@@ -1,12 +1,12 @@
 const express = require("express");
-const { uploadCSV } = require("../controllers/internController");
+const { uploadFile } = require("../controllers/internController");
 const upload = require("../middleware/uploadMiddleware");
 const Intern = require("../models/Intern"); // Import Intern model
 
 const router = express.Router();
 
-//CSV Upload Route
-router.post("/upload", upload.single("file"), uploadCSV);
+// XLSX Upload Route
+router.post("/upload", upload.single("file"), uploadFile);
 
 // Fetch All Interns Route
 router.get("/", async (req, res) => {

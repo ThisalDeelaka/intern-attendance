@@ -1,8 +1,19 @@
-const DashboardCard = ({ title, count, color }) => {
+const DashboardCard = ({ title, count, color, icon }) => {
   return (
-    <div className={`p-8 shadow-xl rounded-xl text-white ${color} flex flex-col items-center justify-center`}>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-4xl font-bold">{count}</p>
+    <div
+      className={`relative flex items-center p-6 shadow-md rounded-2xl text-white ${color} 
+      hover:shadow-lg transition-transform duration-300`}
+    >
+      {/* Icon with Background */}
+      <div className="bg-white p-3 rounded-full shadow-md">
+        {icon}
+      </div>
+      
+      {/* Text Section */}
+      <div className="ml-4">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-5xl font-extrabold">{count}</p>
+      </div>
     </div>
   );
 };
