@@ -3,6 +3,8 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable"; // Import autoTable plugin
+import { ToastContainer, toast } from 'react-toastify'; // Import react-toastify
+import 'react-toastify/dist/ReactToastify.css';
 
 const InternsPage = () => {
   const [interns, setInterns] = useState([]);
@@ -12,6 +14,7 @@ const InternsPage = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Items per page
+  const [file, setFile] = useState(null);
 
   // Fetch interns and attendance data
   const fetchInterns = async () => {
@@ -125,25 +128,70 @@ const InternsPage = () => {
     doc.save("intern-attendance-report.pdf");
   };
 
+  // File upload and handling
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      toast.error("Please select a file first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/interns/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(response.data.message);
+      fetchInterns(); // Refresh intern data
+    } catch (error) {
+      console.error("Error uploading:", error);
+      toast.error("Error uploading file.");
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row">
       <Sidebar />
       <div className="flex-1 bg-gray-50 p-8 space-y-6">
-        <h2 className="text-3xl font-semibold text-gray-800">Intern Attendance</h2>
+        <div className="flex items-center justify-between mb-6">
+          {/* "Intern Attendance" heading */}
+          <h2 className="text-3xl font-semibold text-gray-800">Intern Attendance</h2>
 
-        {/* Search Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          {/* File Upload Section */}
+          <div className="flex items-center gap-4">
+            <input
+              type="file"
+              accept=".xlsx"
+              onChange={handleFileChange}
+              className="p-3 border-2 border-[#4FB846] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4FB846] w-60"
+            />
+            <button
+              onClick={handleUpload}
+              className="bg-[#0D103A] text-white font-semibold py-3 px-8 rounded-lg hover:bg-[#4FB846] transition duration-300"
+            >
+              Upload
+            </button>
+          </div>
+        </div>
+
+        {/* Search Filters and Download PDF Button in the same line */}
+        <div className="flex flex-wrap gap-4 mb-6 items-center">
           <input
             type="text"
             placeholder="Search by Trainee ID or Name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+            className="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 w-full sm:w-60"
           />
           <select
             value={selectedSpecialization}
             onChange={(e) => setSelectedSpecialization(e.target.value)}
-            className="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+            className="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 w-full sm:w-60"
           >
             <option value="">All Specializations</option>
             {uniqueSpecializations.map((spec, index) => (
@@ -157,15 +205,13 @@ const InternsPage = () => {
             placeholder="Search by Team"
             value={searchTeam}
             onChange={(e) => setSearchTeam(e.target.value)}
-            className="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+            className="p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 w-full sm:w-60"
           />
-        </div>
-
-        {/* PDF Download Button */}
-        <div className="mb-4">
+          
+          {/* Download PDF Button */}
           <button
             onClick={generatePDF}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="bg-blue-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-600 w-full sm:w-auto"
           >
             Download PDF
           </button>
@@ -269,6 +315,9 @@ const InternsPage = () => {
           </button>
         </div>
       </div>
+
+      {/* React Toastify Container */}
+      <ToastContainer />
     </div>
   );
 };
