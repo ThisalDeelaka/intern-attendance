@@ -33,12 +33,12 @@ const InternsPage = () => {
     fetchInterns();
   }, []);
 
-  // Function to update attendance status
+  // Function to update attendance status with hover and animation effect
   const handleMarkAttendance = async (id, status) => {
     try {
       await axios.post(`http://localhost:5000/api/interns/mark-attendance/${id}`, { status });
 
-      // Update the UI immediately
+      // Update the UI immediately with a smooth animation
       setInterns((prevInterns) =>
         prevInterns.map((intern) =>
           intern._id === id
@@ -49,6 +49,7 @@ const InternsPage = () => {
             : intern
         )
       );
+      toast.success(`Attendance marked as ${status}`);
     } catch (error) {
       console.error("Error marking attendance:", error);
     }
