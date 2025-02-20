@@ -12,6 +12,8 @@ const {
   updateIntern,
   removeIntern,
   uploadInterns, 
+  getAllTeams,
+  updateTeamName
 } = require("../controllers/internController");
 
 const authenticateUser = require("../middleware/authMiddleware");
@@ -30,6 +32,8 @@ router.put("/update/:id", authenticateUser, updateIntern);
 router.delete("/:id", authenticateUser, removeIntern);
 
 router.post("/upload", authenticateUser, upload.single("file"), uploadInterns); 
-
+// Add these routes at the bottom of the file
+router.get("/teams/all", authenticateUser, getAllTeams);
+router.put("/teams/:oldTeamName", authenticateUser, updateTeamName);
 
 module.exports = router;

@@ -91,6 +91,24 @@ class InternRepository {
     return await Intern.findByIdAndUpdate(internId, data, { new: true });
   }
   
+  static async getAllTeams() {
+    return await Intern.aggregate([
+      { $match: { team: { $ne: "" } } },
+      { $group: { _id: "$team" } },
+      { $project: { _id: 0, name: "$_id" } }
+    ]);
+  }
+
+  static async updateTeamName(oldTeamName, newTeamName) {
+    const result = await Intern.updateMany(
+      { team: oldTeamName },
+      { $set: { team: newTeamName } }
+    );
+    return {
+      modifiedCount: result.modifiedCount,
+      message: `Successfully updated ${result.modifiedCount} interns from ${oldTeamName} to ${newTeamName}`
+    };
+  }
 
 }
 

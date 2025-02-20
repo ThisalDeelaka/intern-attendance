@@ -41,6 +41,13 @@ class InternService {
     return await InternRepository.updateIntern(internId, data);
   }
   
+  async getAllTeams() {
+    return await InternRepository.getAllTeams();
+  }
+
+  async updateTeamName(oldTeamName, newTeamName) {
+    return await InternRepository.updateTeamName(oldTeamName, newTeamName);
+  }
   
 }
 

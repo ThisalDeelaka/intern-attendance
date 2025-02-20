@@ -137,6 +137,32 @@ const uploadInterns = async (req, res) => {
   }
 };
 
+const getAllTeams = async (req, res) => {
+  try {
+    const teams = await InternService.getAllTeams();
+    res.status(200).json(teams);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching teams", error: error.message });
+  }
+};
+
+const updateTeamName = async (req, res) => {
+  try {
+    const { oldTeamName } = req.params;
+    const { newTeamName } = req.body;
+    
+    if (!newTeamName) {
+      return res.status(400).json({ message: "New team name is required" });
+    }
+
+    const result = await InternService.updateTeamName(oldTeamName, newTeamName);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating team", error: error.message });
+  }
+};
+
+
 module.exports = {
   addIntern,
   getAllInterns,
@@ -149,4 +175,6 @@ module.exports = {
   removeIntern,
   updateIntern,
   uploadInterns,
+  getAllTeams,
+  updateTeamName
 };
