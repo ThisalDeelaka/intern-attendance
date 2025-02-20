@@ -29,6 +29,7 @@ class InternService {
     return await InternRepository.assignToTeam(internIds, teamName);
   }
 
+
   async removeFromTeam(internId) {
     return await InternRepository.removeFromTeam(internId);
   }
@@ -42,13 +43,29 @@ class InternService {
   }
   
   async getAllTeams() {
-    return await InternRepository.getAllTeams();
+    try {
+      const teams = await InternRepository.getAllTeams();
+      return teams;
+    } catch (error) {
+      throw new Error('Error fetching teams from repository: ' + error.message);
+    }
   }
 
   async updateTeamName(oldTeamName, newTeamName) {
     return await InternRepository.updateTeamName(oldTeamName, newTeamName);
   }
   
+  async assignSingleToTeam(internId, teamName) {
+    return await InternRepository.assignSingleToTeam(internId, teamName);
+  }
+
+
+  
+
+  async deleteTeam(teamName) {
+    return await InternRepository.deleteTeam(teamName);
+  }
+
 }
 
 module.exports = new InternService();

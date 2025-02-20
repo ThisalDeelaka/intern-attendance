@@ -77,14 +77,28 @@ const assignToTeam = async (req, res) => {
 };
 
 
+
 const removeFromTeam = async (req, res) => {
   try {
-    await InternService.removeFromTeam(req.params.id);
-    res.status(200).json({ message: "Intern removed from team successfully" });
+    const { internId } = req.body;
+    const { teamName } = req.params;  
+
+    if (!internId || !teamName) {
+      return res.status(400).json({ message: "Intern ID and Team Name are required." });
+    }
+
+    const result = await InternService.removeFromTeam(internId);
+    if (result) {
+      return res.status(200).json({ message: "Intern removed from the team." });
+    } else {
+      return res.status(404).json({ message: "Intern not found." });
+    }
   } catch (error) {
-    res.status(500).json({ message: "Error removing intern from team", error: error.message });
+    console.error("Error removing intern:", error);
+    res.status(500).json({ message: "Error removing intern from the team" });
   }
 };
+
 
 
 const removeIntern = async (req, res) => {
@@ -162,6 +176,40 @@ const updateTeamName = async (req, res) => {
   }
 };
 
+const assignSingleToTeam = async (req, res) => {
+  try {
+    const { internId } = req.body;
+    const { teamName } = req.params;  // Get team name from URL parameters
+
+    if (!internId || !teamName) {
+      return res.status(400).json({ message: "Intern ID and Team Name are required." });
+    }
+
+    const result = await InternService.assignSingleToTeam(internId, teamName);
+    if (result) {
+      return res.status(200).json({ message: "Intern added to the team!" });
+    } else {
+      return res.status(404).json({ message: "Intern not found." });
+    }
+  } catch (error) {
+    console.error("Error adding intern:", error);
+    res.status(500).json({ message: "Error adding intern to the team" });
+  }
+};
+
+
+const deleteTeam = async (req, res) => {
+  try {
+    const result = await InternService.deleteTeam(req.params.teamName);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting team",
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   addIntern,
@@ -176,5 +224,7 @@ module.exports = {
   updateIntern,
   uploadInterns,
   getAllTeams,
-  updateTeamName
+  updateTeamName,
+  assignSingleToTeam,
+  deleteTeam,
 };

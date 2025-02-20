@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { useNavigate } from "react-router-dom";
+import { toast, Toaster } from 'react-hot-toast';
 
 const InternsPage = () => {
   const [interns, setInterns] = useState([]);
@@ -31,14 +32,17 @@ const InternsPage = () => {
   };
 
   // Fetch interns and attendance data
-  
   const fetchInterns = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/interns",getAuthHeaders());
+      const response = await axios.get("http://localhost:5000/api/interns", getAuthHeaders());
       setInterns(response.data);
     } catch (error) {
       console.error("Error fetching interns:", error);
+      if (error.response?.status === 401) {
+        alert("Session expired. Please log in again.");
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
@@ -72,6 +76,12 @@ const InternsPage = () => {
 
   const handleMarkAttendance = async (id, status) => {
     try {
+      const intern = interns.find((intern) => intern._id === id); // Find the intern by ID
+      if (!intern) {
+        toast.error("Intern not found!");
+        return;
+      }
+  
       const response = await axios.post(
         `http://localhost:5000/api/interns/mark-attendance/${id}`,
         { status },
@@ -79,13 +89,15 @@ const InternsPage = () => {
       );
   
       if (response.status === 200) {
-        fetchInterns(); 
+        fetchInterns(); // Refresh intern data
+        toast.success(`Attendance marked as ${status} for ${intern.traineeName}`);
       }
     } catch (error) {
       console.error("Error marking attendance:", error.response?.data || error.message);
-      alert("Error marking attendance. Make sure you are logged in.");
+      toast.error("Error marking attendance. Make sure you are logged in.");
     }
   };
+  
 
   const uniqueSpecializations = [...new Set(interns.map((i) => i.fieldOfSpecialization))];
 
@@ -137,39 +149,38 @@ const InternsPage = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please select a file first.");
+      toast.error("Please select a file first.");
       return;
     }
-  
+
     setUploading(true);
-  
+
     const formData = new FormData();
     formData.append("file", file);
-  
+
     try {
       const response = await axios.post("http://localhost:5000/api/interns/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, 
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-  
-      if (response.data.newInterns && response.data.newInterns.length > 0) {
-        setInterns((prevInterns) => [...prevInterns, ...response.data.newInterns]);
-        alert("Interns added successfully!");
+
+      if (response.data.addedCount > 0) {
+        toast.success(`${response.data.addedCount} interns added successfully!`);
       } else {
-        alert("No interns were added.");
+        toast.error("No interns were added.");
       }
-  
-      window.location.reload();
+
+      // Optionally, you can reload the page if needed:
+      // window.location.reload();
     } catch (error) {
       console.error("Error uploading:", error.response?.data || error.message);
-      alert("Error uploading file.");
+      toast.error("Error uploading file.");
     } finally {
       setUploading(false);
     }
   };
-  
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -324,6 +335,9 @@ const InternsPage = () => {
           </button>
         </div>
       </div>
+
+      {/* Toast notifications */}
+      <Toaster position="top-right" />
     </div>
   );
 };

@@ -13,7 +13,9 @@ const {
   removeIntern,
   uploadInterns, 
   getAllTeams,
-  updateTeamName
+  updateTeamName,
+  assignSingleToTeam,
+  deleteTeam
 } = require("../controllers/internController");
 
 const authenticateUser = require("../middleware/authMiddleware");
@@ -26,14 +28,19 @@ router.get("/attendance-stats", authenticateUser, getAttendanceStats);
 router.post("/mark-attendance/:id", authenticateUser, markAttendance);
 router.put("/update-attendance/:id", authenticateUser, updateAttendance);
 router.post("/assign-to-team", authenticateUser, assignToTeam);
-router.put("/remove-from-team/:id", authenticateUser, removeFromTeam);
+
 router.get("/:id", authenticateUser, getInternById);
 router.put("/update/:id", authenticateUser, updateIntern);
 router.delete("/:id", authenticateUser, removeIntern);
 
 router.post("/upload", authenticateUser, upload.single("file"), uploadInterns); 
-// Add these routes at the bottom of the file
 router.get("/teams/all", authenticateUser, getAllTeams);
 router.put("/teams/:oldTeamName", authenticateUser, updateTeamName);
+
+router.delete("/teams/:teamName", authenticateUser, deleteTeam);
+
+router.put("/teams/:teamName/assign-single", authenticateUser, assignSingleToTeam);
+
+router.put("/teams/:teamName/remove", authenticateUser, removeFromTeam);
 
 module.exports = router;

@@ -20,6 +20,8 @@ const AttendanceOverviewPage = () => {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [selectedDate, setSelectedDate] = useState(""); // To manage selected date
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const rowsPerPage = 10; // Number of rows per page
 
   // Fetch intern data on component mount
   useEffect(() => {
@@ -151,6 +153,14 @@ const AttendanceOverviewPage = () => {
     setFilteredAttendance(attendanceHistory); // Show all
   };
 
+  // Slice attendance for pagination
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = filteredAttendance.slice(indexOfFirstRow, indexOfLastRow);
+
+  // Change page
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
@@ -211,7 +221,7 @@ const AttendanceOverviewPage = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredAttendance.map((entry) => (
+              {currentRows.map((entry) => (
                 <tr key={entry.date} className="hover:bg-gray-50 transition-all">
                   <td className="p-4 border-b">{new Date(entry.date).toLocaleDateString()}</td>
                   <td className="p-4 border-b">{entry.status}</td>
@@ -224,6 +234,27 @@ const AttendanceOverviewPage = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <div className="text-sm text-gray-600">
+            Page {currentPage} of {Math.ceil(filteredAttendance.length / rowsPerPage)}
+          </div>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === Math.ceil(filteredAttendance.length / rowsPerPage)}
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
 
         {/* Edit Profile Modal */}

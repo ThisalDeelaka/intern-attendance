@@ -80,7 +80,13 @@ class InternRepository {
 
   
   static async removeFromTeam(internId) {
-    return await Intern.findByIdAndUpdate(internId, { team: "" }, { new: true });
+    
+    const updatedIntern = await Intern.findByIdAndUpdate(
+      internId,
+      { $set: { team: "" } },
+      { new: true }
+    );
+    return updatedIntern;
   }
 
   static async removeIntern(internId) {
@@ -92,12 +98,25 @@ class InternRepository {
   }
   
   static async getAllTeams() {
-    return await Intern.aggregate([
-      { $match: { team: { $ne: "" } } },
-      { $group: { _id: "$team" } },
-      { $project: { _id: 0, name: "$_id" } }
-    ]);
+    try {
+     
+      const teams = await Intern.aggregate([
+        { $match: { team: { $ne: "" } } }, 
+        { $group: { _id: "$team", members: { $push: "$$ROOT" } } }, 
+        {
+          $project: {
+            name: "$_id", 
+            members: 1,   
+            _id: 0,       
+          }
+        }
+      ]);
+      return teams;
+    } catch (error) {
+      throw new Error('Error fetching teams: ' + error.message);
+    }
   }
+
 
   static async updateTeamName(oldTeamName, newTeamName) {
     const result = await Intern.updateMany(
@@ -110,6 +129,26 @@ class InternRepository {
     };
   }
 
+  static async deleteTeam(teamName) {
+    const result = await Intern.updateMany(
+      { team: teamName },
+      { $set: { team: "" } }
+    );
+    return {
+      deletedCount: result.modifiedCount,
+      message: `Team "${teamName}" deleted - ${result.modifiedCount} interns removed`,
+    };
+  }
+  
+  static async assignSingleToTeam(internId, teamName) {
+    // Find the intern by ID and update their team
+    const updatedIntern = await Intern.findByIdAndUpdate(
+      internId,
+      { $set: { team: teamName } }, 
+      { new: true }
+    );
+    return updatedIntern;
+  }
 }
 
 module.exports = InternRepository;

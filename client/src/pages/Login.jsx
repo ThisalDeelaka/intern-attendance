@@ -85,6 +85,16 @@ const Login = () => {
         </form>
 
         {message && <p className="mt-4 text-center text-red-500">{message}</p>}
+
+        <p className="mt-4 text-center text-gray-600">
+          Don't have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer hover:underline"
+            onClick={() => navigate("/register")}
+          >
+            Register here
+          </span>
+        </p>
       </div>
 
       <Toaster position="bottom-right" reverseOrder={false} />
