@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const attendanceSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
-  status: { type: String, enum: ['Present', 'Absent'], required: true, default: 'Absent' },
+  status: { type: String, enum: ["Present", "Absent"], default: "Absent" },
 });
 
 const internSchema = new mongoose.Schema({
@@ -13,4 +13,4 @@ const internSchema = new mongoose.Schema({
   attendance: [attendanceSchema],
 });
 
-module.exports = mongoose.model('Intern', internSchema);
+module.exports = mongoose.model("Intern", internSchema);
