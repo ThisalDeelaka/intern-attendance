@@ -8,7 +8,7 @@ const isTokenExpired = (token) => {
 };
 
 export const api = axios.create({
-  baseURL: "http://localhost:5000/api", 
+  baseURL: "https://intern-attendance-backend.onrender.com/api", 
 });
 
 export const getAuthHeaders = () => {
