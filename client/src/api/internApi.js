@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/interns";
+const API_URL = "https://intern-attendance-backend.onrender.com/api/interns";
 
 
 const getAuthHeaders = () => {
