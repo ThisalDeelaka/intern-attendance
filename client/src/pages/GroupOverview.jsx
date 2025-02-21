@@ -1,309 +1,293 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api, getAuthHeaders } from "../api/apiConfig";
-import { Users, Plus, Loader2, Search, X, Trash2, UserPlus } from 'lucide-react';
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+import { Users, Plus, Loader2, Search, X, Trash2, UserPlus, ChevronDown } from 'lucide-react';
+import {
+  UserGroupIcon,
+} from "@heroicons/react/outline";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
 
+// TeamCard Component
+const TeamCard = ({ team, onAddMember, onRemoveMember, onDeleteTeam }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="bg-white rounded-2xl border border-blue-500 shadow-sm hover:shadow-lg transition-all duration-300">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#001845]/10 rounded-full flex items-center justify-center">
+              <Users className="h-5 w-5 text-[#001845]" />
+            </div>
+            <h3 className="text-lg font-semibold text-[#060B27]">{team.name}</h3>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onAddMember(team.name)}
+              className="inline-flex items-center justify-center p-2 hover:bg-[#060B27]/5 rounded-xl text-[#060B27] transition-colors"
+            >
+              <UserPlus className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => onDeleteTeam(team.name)}
+              className="inline-flex items-center justify-center p-2 hover:bg-red-50 rounded-xl text-red-500 transition-colors"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-500">
+              Members ({team.members?.length || 0})
+            </span>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-gray-500 hover:text-[#060B27] transition-colors"
+            >
+              <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+
+          <div className={`space-y-3 transition-all duration-300 ${isExpanded ? 'max-h-[500px]' : 'max-h-48'} overflow-hidden`}>
+            {team.members?.map((member) => (
+              <div key={member._id} className="group p-4 rounded-xl bg-gray-50 hover:bg-[#060B27]/5 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-[#060B27]">{member.traineeName}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm text-gray-500">{member.traineeId}</span>
+                      <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                      <span className="text-sm text-gray-500">{member.fieldOfSpecialization}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => onRemoveMember(team.name, member._id)}
+                    className="opacity-100  p-2 bg-red-200 text-sm text-red-700 hover:bg-red-400 rounded-full transition-all duration-200"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// AddMemberModal Component
+const AddMemberModal = ({ isOpen, onClose, teamName, availableInterns, onAddIntern }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredInterns = availableInterns.filter(intern =>
+    intern.traineeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    intern.traineeId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return isOpen ? (
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+      <div className="bg-white border rounded-2xl w-full max-w-lg mx-4 shadow-xl">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-[#060B27]">Add Members to {teamName}</h3>
+            <button
+              onClick={onClose}
+              className="inline-flex items-center justify-center p-2 hover:bg-gray-100 rounded-xl text-gray-500 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="relative mb-6">
+            <Search className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search members..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#060B27] focus:ring focus:ring-[#060B27]/20 transition-all"
+            />
+          </div>
+
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {filteredInterns.map(intern => (
+              <div key={intern._id} className="p-4 rounded-xl bg-gray-50 hover:bg-[#060B27]/5 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-[#060B27]">{intern.traineeName}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm text-gray-500">{intern.traineeId}</span>
+                      <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                      <span className="text-sm text-gray-500">{intern.fieldOfSpecialization}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => onAddIntern(intern._id)}
+                    className="p-3 rounded-full bg-green-100 hover:bg-green-300 text-green-700 font-medium transition-colors"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : null;
+};
+
+// Main Component
 const GroupOverview = () => {
   const [teams, setTeams] = useState([]);
   const [interns, setInterns] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [fieldOfSpecialization, setFieldOfSpecialization] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch teams and interns on page load
-  useEffect(() => {
-    const fetchTeamsAndInterns = async () => {
-      try {
-        const teamResponse = await api.get("/interns/teams/all", getAuthHeaders());
-        const internResponse = await api.get("/interns", getAuthHeaders());
-        setTeams(teamResponse.data);
-        setInterns(internResponse.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to load teams or interns.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTeamsAndInterns();
+  const fetchData = useCallback(async () => {
+    try {
+      const [teamResponse, internResponse] = await Promise.all([
+        api.get("/interns/teams/all", getAuthHeaders()),
+        api.get("/interns", getAuthHeaders())
+      ]);
+      setTeams(teamResponse.data);
+      setInterns(internResponse.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load teams or interns.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Handle modal opening for adding an intern
-  const handleOpenModal = (teamName) => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleAddMember = (teamName) => {
     setSelectedTeam(teamName);
     setModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSearchTerm('');
-  };
-
-  // Handle search term change
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  // Filter interns based on search term and field of specialization
-  const filteredInterns = interns.filter((intern) => {
-    const matchesSearchTerm = intern.traineeId?.includes(searchTerm) ||
-      intern.traineeName?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesSpecialization = !fieldOfSpecialization || intern.fieldOfSpecialization === fieldOfSpecialization;
-
-    return matchesSearchTerm && matchesSpecialization;
-  });
-
-  // Handle intern adding/removal from the team
-  const handleAddRemoveIntern = async (internId, action) => {
-    if (selectedTeam) {
-      try {
-        let response;
-        if (action === "add") {
-          response = await api.put(
-            `/interns/teams/${selectedTeam}/assign-single`,
-            { internId },
-            getAuthHeaders()
-          );
-          if (response.status === 200) {
-            toast.success("Intern added to the team!");
-            // Update the intern list in the selected team without refreshing
-            setTeams((prevTeams) =>
-              prevTeams.map((team) =>
-                team.name === selectedTeam
-                  ? { ...team, members: [...team.members, response.data] }
-                  : team
-              )
-            );
-          } else {
-            toast.error("Failed to add intern.");
-          }
-        } else if (action === "remove") {
-          response = await api.put(
-            `/interns/teams/${selectedTeam}/remove-single`,
-            { internId },
-            getAuthHeaders()
-          );
-          if (response.status === 200) {
-            toast.success("Intern removed from the team!");
-            // Remove the intern from the selected team without refreshing
-            setTeams((prevTeams) =>
-              prevTeams.map((team) =>
-                team.name === selectedTeam
-                  ? { ...team, members: team.members.filter((member) => member._id !== internId) }
-                  : team
-              )
-            );
-          } else {
-            toast.error("Failed to remove intern.");
-          }
-        }
-      } catch (error) {
-        toast.error("Error updating intern.");
+  const handleAddIntern = async (internId) => {
+    try {
+      const response = await api.put(
+        `/interns/teams/${selectedTeam}/assign-single`,
+        { internId },
+        getAuthHeaders()
+      );
+      if (response.status === 200) {
+        toast.success("Intern added to the team!");
+        fetchData(); // Refresh data
       }
+    } catch (error) {
+      toast.error("Error adding intern.");
+    } finally {
+      setModalOpen(false);
     }
   };
 
-  // Show the first 5 interns in the modal (if no search input)
-  const internsToShow = searchTerm.length > 0 ? filteredInterns : interns.slice(0, 5);
+  const handleRemoveMember = async (teamName, internId) => {
+    try {
+      const response = await api.put(
+        `/interns/teams/${teamName}/remove`,
+        { internId },
+        getAuthHeaders()
+      );
+      if (response.status === 200) {
+        toast.success("Intern removed from the team.");
+        fetchData(); // Refresh data
+      }
+    } catch (error) {
+      toast.error("Error removing intern.");
+    }
+  };
 
-  // Handle team deletion
   const handleDeleteTeam = async (teamName) => {
     try {
       const response = await api.delete(`/interns/teams/${teamName}`, getAuthHeaders());
       if (response.status === 200) {
         toast.success("Team deleted successfully.");
-        // Remove deleted team from the state
-        const updatedTeams = teams.filter((team) => team.name !== teamName);
-        setTeams(updatedTeams);
-      } else {
-        toast.error("Failed to delete team.");
+        fetchData(); // Refresh data
       }
     } catch (error) {
       toast.error("Error deleting team.");
     }
   };
 
+  const getAvailableInterns = (teamName) => {
+    const team = teams.find(t => t.name === teamName);
+    if (!team) return interns;
+    return interns.filter(intern => !team.members.some(member => member._id === intern._id));
+  };
+
   return (
     <div className="flex min-h-screen bg-[#f8fafc]">
       <Sidebar />
-      <div className="flex-1 overflow-x-hidden">
+      <div className="flex-1">
         <Navbar />
-
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 mt-16">
-          <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8">
-            {/* Header Section */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-[#0D103A] rounded-xl">
-                  <Users className="h-7 w-7 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-[#0D103A]">Team Management</h1>
-                  <p className="text-sm text-gray-500 mt-1">Manage existing teams and their members</p>
-                </div>
+        
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 mt-28">
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-4 rounded-2xl">
+                <UserGroupIcon className="h-10 w-auto text-4xl  text-green-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-[#060B27]">Team Management</h1>
+                <p className="text-gray-500">Organize and manage your teams effectively</p>
               </div>
             </div>
-
-            {/* Teams Grid */}
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 text-[#4FB846] animate-spin mb-3" />
-                <p className="text-sm text-gray-500">Loading teams...</p>
-              </div>
-            ) : teams.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="mb-4 mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
-                  <Users className="h-10 w-10 text-gray-400" />
-                </div>
-                <p className="text-gray-500">No teams created yet</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {teams.map((team) => (
-                  <div key={team.name} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="p-4 border-b border-gray-100">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-[#0D103A]">{team.name}</h3>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleOpenModal(team.name)}
-                            className="p-1.5 hover:bg-gray-100 rounded-lg text-[#4FB846] hover:text-[#3f9238]"
-                          >
-                            <UserPlus className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteTeam(team.name)}
-                            className="p-1.5 hover:bg-gray-100 rounded-lg text-red-500 hover:text-red-600"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Team Members */}
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-medium text-gray-500">Members ({team.members?.length || 0})</span>
-                      </div>
-                      <div className="space-y-3">
-                        {team.members && team.members.length > 0 ? (
-                          team.members.map((member) => (
-                            <div key={member._id} className="flex items-center justify-between group">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-800 truncate">{member.traineeName}</p>
-                                <div className="text-xs text-gray-500 truncate">
-                                  {member.traineeId} • {member.fieldOfSpecialization}
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => handleAddRemoveIntern(member._id, "remove")}
-                                className="text-red-500 hover:text-red-600 p-1"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-3">
-                            <p className="text-sm text-gray-400">No members in this team</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
-        </main>
-      </div>
 
-      {/* Add Intern Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-xl">
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-xl font-semibold text-[#0D103A]">Add Members to {selectedTeam}</h3>
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 text-green-500 animate-spin" />
             </div>
-            
-            <div className="p-6">
-              <div className="relative mb-4">
-                <div className="absolute left-3 top-3.5 text-gray-400">
-                  <Search className="h-5 w-5" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search interns..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-[#4FB846] focus:ring-2 focus:ring-[#4FB846]/20 transition-all"
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {teams.map((team) => (
+                <TeamCard
+                  key={team.name}
+                  team={team}
+                  onAddMember={handleAddMember}
+                  onRemoveMember={handleRemoveMember}
+                  onDeleteTeam={handleDeleteTeam}
                 />
-              </div>
-
-              <div className="max-h-[400px] overflow-y-auto">
-                {internsToShow.length > 0 ? (
-                  internsToShow.map((intern) => (
-                    <div
-                      key={intern._id}
-                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800">{intern.traineeName}</p>
-                        <div className="text-xs text-gray-500">
-                          {intern.traineeId} • {intern.fieldOfSpecialization}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleAddRemoveIntern(intern._id, "add")}
-                        className="ml-4 px-3 py-1.5 bg-[#4FB846] hover:bg-[#3f9238] text-white rounded-lg text-sm font-medium transition-colors"
-                      >
-                        Add
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-6">
-                    <Search className="h-8 w-8 mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-500">No interns found</p>
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
+          )}
+        </main>
 
-            <div className="p-4 border-t border-gray-100 flex justify-end">
-              <button
-                onClick={handleCloseModal}
-                className="px-4 py-2 text-gray-500 hover:text-gray-700 font-medium"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <AddMemberModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          teamName={selectedTeam}
+          availableInterns={getAvailableInterns(selectedTeam)}
+          onAddIntern={handleAddIntern}
+        />
 
-      <ToastContainer 
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        theme="light"
-        toastStyle={{
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}
-      />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+      </div>
     </div>
   );
 };
