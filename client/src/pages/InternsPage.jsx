@@ -35,7 +35,7 @@ const InternsPage = () => {
   const fetchInterns = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/interns", getAuthHeaders());
+      const response = await axios.get("https://intern-attendance-backend.onrender.com/api/interns", getAuthHeaders());
       setInterns(response.data);
     } catch (error) {
       console.error("Error fetching interns:", error);
@@ -83,7 +83,7 @@ const InternsPage = () => {
       }
   
       const response = await axios.post(
-        `http://localhost:5000/api/interns/mark-attendance/${id}`,
+        `https://intern-attendance-backend.onrender.com/api/interns/mark-attendance/${id}`,
         { status },
         getAuthHeaders() 
       );
@@ -159,7 +159,7 @@ const InternsPage = () => {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/interns/upload", formData, {
+      const response = await axios.post("https://intern-attendance-backend.onrender.com/api/interns/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
